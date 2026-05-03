@@ -4,6 +4,7 @@ used AI to create a Morphing Clock with DMDESP library from https://github.com/b
 Article: 
 - https://nicuflorica.blogspot.com/2026/04/ceas-ntp-cu-animatii-pe-afisaj-led.html
 - https://nicuflorica.blogspot.com/2026/04/ceas-ntp-cu-animatii-pe-afisaj-led_29.html
+- https://nicuflorica.blogspot.com/2026/05/ceas-ntp-cu-animatii-si-date-meteo-pe.html
 
 Note about software versions:
 - version 0b.ino => thick 7-segment numbers for a Morphing Clock (HH:MM and "beat" the seconds) -> not too much animation
