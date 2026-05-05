@@ -422,10 +422,15 @@ void OpenMeteo()
 
     // Construim URL-ul cererii. 
     // Parametrul "current=" cere exact datele care ne interesează în acest moment.
+/*
     String url = "https://api.open-meteo.com/v1/forecast?latitude=" + String(latitude, 4) + 
                  "&longitude=" + String(longitude, 4) + 
                //  "&current=temperature_2m,relative_humidity_2m,surface_pressure,weather_code&timezone=auto";
                  "&current=temperature_2m,relative_humidity_2m,surface_pressure,weather_code,wind_speed_10m,wind_direction_10m&timezone=auto";
+*/
+   String url = "https://api.open-meteo.com/v1/forecast?latitude=" + String(latitude, 4) + 
+                 "&longitude=" + String(longitude, 4) + 
+                 "&current=temperature_2m,relative_humidity_2m,surface_pressure,pressure_msl,weather_code,wind_speed_10m,wind_direction_10m&timezone=auto";
     
     http.begin(client, url);
     int httpCode = http.GET();
@@ -440,17 +445,22 @@ void OpenMeteo()
         Serial.print("Eroare la parsarea JSON: ");
         Serial.println(error.c_str());
       } else {
-        // Extragem datele din structura JSON specifică Open-Meteo
         float temp = doc["current"]["temperature_2m"].as<float>();
         float umiditate = doc["current"]["relative_humidity_2m"].as<float>();
-        float presiune_hPa = doc["current"]["surface_pressure"].as<float>();
         int codVreme = doc["current"]["weather_code"].as<int>();
-        String timp = doc["current"]["time"].as<String>(); // Returnează ora exactă a măsurătorii
+        String timp = doc["current"]["time"].as<String>();
+
+ //     // Traducem codul numeric în text românesc
+        String descriere = traducereVreme(codVreme);     
         
-        // Traducem codul numeric în text românesc
-        String descriere = traducereVreme(codVreme);       
-        // Conversie din hPa în mmHg (factorul de conversie este 0.75006)
-        float presiune_mmHg = presiune_hPa * 0.75006;
+        // Citim ambele tipuri de presiune (in hPa)
+        float presiuneSol_hPa = doc["current"]["surface_pressure"].as<float>();
+        float presiuneMSL_hPa = doc["current"]["pressure_msl"].as<float>();
+        
+        // Convertim in mmHg (1 hPa = 0.75006 mmHg)
+        float presiuneSol_mmHg = presiuneSol_hPa * 0.75006;
+        float presiuneMSL_mmHg = presiuneMSL_hPa * 0.75006;
+
         float vitezaVant = doc["current"]["wind_speed_10m"].as<float>();
         int directieGrade = doc["current"]["wind_direction_10m"].as<int>();
         
@@ -469,9 +479,9 @@ void OpenMeteo()
         meteo3 = "Umiditate: ";
         meteo3 = meteo3 + int(umiditate) + "%";  
         meteo4 = "Presiune: ";
-        meteo4 = meteo4 + int(presiune_mmHg+0.5) + "mmHg";
+        meteo4 = meteo4 + int(presiuneMSL_mmHg+0.5) + " mmHg";
         meteo5 = "Vant: ";
-        meteo5 = meteo5 + vitezaVant1 + "." + vitezaVant2  + "km/h din " + directieVant(directieGrade1) + " !"; 
+        meteo5 = meteo5 + vitezaVant1 + "." + vitezaVant2  + " km/h din " + directieVant(directieGrade1) + " !"; 
         Serial.println("\n=========================================");
         Serial.printf("Locatie: %.4f, %.4f\n", latitude, longitude);
         Serial.printf("Ora masuratoarii: %s\n", timp.c_str());
@@ -479,9 +489,9 @@ void OpenMeteo()
         Serial.printf("Stare: %s (Cod %d)\n", descriere.c_str(), codVreme);
         Serial.printf("Temperatura: %.1f °C\n", temp);
         Serial.printf("Umiditate: %.0f %%\n", umiditate);     
-        //Serial.printf("Presiune: %.0f hPa\n", presiune);
+        Serial.printf("Presiune_nivelul marii: %.0f mmHg\n", presiuneMSL_mmHg);
          // Afișăm presiunea în mmHg cu o zecimală (%.1f)
-        Serial.printf("Presiune: %.1f mmHg\n", presiune_mmHg);
+        Serial.printf("Presiune sol: %.1f mmHg\n", presiuneSol_mmHg);
         Serial.printf("Vant: %.1f km/h din %s (%d grade)\n", vitezaVant, directieVant(directieGrade).c_str(), directieGrade);
         Serial.println("=========================================\n");
       }
