@@ -588,8 +588,8 @@ void OpenMeteo()
           
           meteo7 = "indice poluare: ";
           meteo7 = meteo7 + calitateaer + "  (" + descriereAQI(calitateaer) + ")";
-          meteo8 = "PM2.5 ";
-          meteo8 = meteo8 + pm251 + "." + pm252 + " &m/g3 PM10 " + pm101 + "." + pm102 + " &m/g3" ;
+          meteo8 = "PM2.5: ";
+          meteo8 = meteo8 + pm251 + "." + pm252 + " &g/m3 PM10: " + pm101 + "." + pm102 + " &g/m3";
                     
           Serial.println("-----------------------------------------");
           Serial.printf("Indice Aer (European): %.0f (%s)\n", euAqi, descriereAQI(euAqi).c_str());
